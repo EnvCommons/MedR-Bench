@@ -1,170 +1,86 @@
-# MedRBench Environment
+# MedRBench
 
-MedRBench is an OpenReward environment for evaluating medical diagnosis and treatment plan generation capabilities of AI agents. The environment presents medical case reports and uses binary LLM grading to assess agent responses.
+[![⭐ OpenReward Environment](https://img.shields.io/badge/%E2%AD%90%20OpenReward-Environment-f7e6cc)](https://openreward.ai/GeneralReasoning/medrb)
 
-## Overview
+## Description
 
-- **Tasks**: 1,453 medical cases (957 diagnosis + 496 treatment)
-- **Task Types**: Diagnosis and Treatment Planning
-- **Evaluation**: Binary grading (1.0 correct / 0.0 incorrect) using gpt-5-mini
-- **Source**: [MedRBench Dataset](https://github.com/MAGIC-AI4Med/MedRBench)
+MedRBench is an environment for evaluating medical diagnosis and treatment plan generation from clinical case reports. Based on the MedRBench benchmark from MAGIC-AI4Med (Shanghai Jiao Tong University / Shanghai AI Lab), it presents rare and complex medical cases and evaluates agent responses using binary LLM grading for semantic equivalence.
 
-## Installation
+## Capabilities
 
-```bash
-# Clone or navigate to the medrb directory
-cd medrb
+- Medical diagnosis from clinical case reports
+- Treatment plan generation for complex medical cases
+- Reasoning about rare diseases, body systems, and disorder categories
 
-# Install dependencies
-pip install -r requirements.txt
-```
+## Compute Requirements
 
-## Data
-
-The environment includes local data files:
-- **Diagnosis cases**: 957 cases with rare diseases (diagnosis.json, ~14MB)
-- **Treatment cases**: 496 cases with rare diseases (treatment.json, ~8.1MB)
-
-Data files are stored in:
-- **Local development**: `data/` directory
-- **Production deployment**: `/orwd_data/` directory (automatically detected)
-
-## Usage
-
-### Running the Server
-
-```bash
-python server.py
-```
-
-The server runs on port 8080 by default.
-
-### Testing with an Agent
-
-```bash
-export OPENAI_API_KEY="your-api-key"
-python test_agent.py
-```
-
-### Running Unit Tests
-
-```bash
-pytest tests.py -v
-```
-
-## Task Structure
-
-Each task contains:
-- `case_id`: PubMed Central ID (e.g., "PMC11625232")
-- `task_type`: Either "diagnosis" or "treatment"
-- `raw_case`: Full medical case report text
-- `case_summary`: Structured summary of the case
-- `expected_output`: Ground truth answer for grading
-- `body_category`: Anatomical categories
-- `disorder_category`: Disease categories
-- `rare_disease`: Rare disease indicators
-
-## Environment Interface
-
-### Tool
-
-**`answer(params: AnswerInput)`**
-- Submit diagnosis or treatment plan for evaluation
-- Returns binary reward (1.0 or 0.0)
-- Includes grading explanation and reference answer
-
-### Methods
-
-**`get_prompt() -> List[TextBlock]`**
-- Returns task-specific prompt (diagnosis or treatment)
-- Includes full case report text
-
-**`list_tasks(split: str) -> list[JSONObject]`**
-- Returns all 1,453 tasks for "test" split
-
-**`list_splits() -> list[str]`**
-- Returns available splits: ["test"]
-
-## Grading
-
-The environment uses gpt-5-mini to grade agent responses with:
-- **Semantic equivalence**: Accepts medical terminology variations
-- **Binary scoring**: 1.0 (correct) or 0.0 (incorrect)
-- **Retry logic**: Up to 3 attempts for robust evaluation
-
-### Grading Criteria
-
-**Diagnosis Tasks:**
-- Core diagnosis must match reference
-- Medical terminology variations accepted
-- Focus on primary pathology
-
-**Treatment Tasks:**
-- Primary intervention must match reference
-- Clinically appropriate variations accepted
-- Therapeutic equivalence over exact matching
-
-## Docker Deployment
-
-```bash
-# Build image
-docker build -t medrb:latest .
-
-# Run container
-docker run -p 8080:8080 -e OPENAI_API_KEY=$OPENAI_API_KEY medrb:latest
-```
-
-## File Structure
-
-```
-medrb/
-├── data/              # Data files
-│   ├── diagnosis.json # 957 diagnosis cases (~14MB)
-│   └── treatment.json # 496 treatment cases (~8.1MB)
-├── medrb.py           # Main environment class
-├── server.py          # Server wrapper
-├── prompts.py         # Grading templates
-├── utils.py           # Data loading utilities
-├── test_agent.py      # Agent integration testing
-├── tests.py           # Unit tests
-├── requirements.txt   # Dependencies
-├── Dockerfile         # Container configuration
-└── README.md          # This file
-```
-
-## Development
-
-### Syntax Check
-
-```bash
-python -m py_compile medrb.py prompts.py utils.py server.py
-```
-
-### Running Tests
-
-```bash
-# Unit tests
-pytest tests.py -v
-
-# Integration tests
-export OPENAI_API_KEY="your-api-key"
-python test_agent.py
-```
-
-## Citation
-
-If you use this environment, please cite the MedRBench paper:
-
-```
-@article{medrb2024,
-  title={MedRBench: A Benchmark for Medical Reasoning},
-  author={MAGIC-AI4Med},
-  journal={GitHub},
-  year={2024},
-  url={https://github.com/MAGIC-AI4Med/MedRBench}
-}
-```
+Agents are given a standard sandbox environment. No special compute resources are required.
 
 ## License
 
-This environment implementation follows the OpenReward framework. The MedRBench dataset is subject to its original license terms.
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+## Tasks
+
+There is one split in this environment:
+
+- **Test**: 1,453 medical cases
+  - Diagnosis: 957 cases
+  - Treatment: 496 cases
+
+Each task presents a full medical case report. For diagnosis tasks, the agent must provide a diagnosis. For treatment tasks, the agent must propose a treatment plan.
+
+## Reward Structure
+
+This is a single-turn environment with binary reward:
+
+- **1.0** — Correct (semantically equivalent to the reference)
+- **0.0** — Incorrect
+
+Grading is performed by gpt-5-mini using task-specific templates:
+- **Diagnosis grading**: Evaluates whether the core diagnosis matches, accepting medical terminology variations (e.g., "MI" vs "myocardial infarction")
+- **Treatment grading**: Evaluates therapeutic equivalence, accepting clinically appropriate variations in dosing, drug class, and supportive care
+
+Includes a retry loop (3 attempts) for robust evaluation.
+
+## Data
+
+Data consists of two JSON files stored on the OpenReward platform:
+- `diagnosis.json`: 957 diagnosis cases with rare diseases
+- `treatment.json`: 496 treatment cases with rare diseases
+
+Source: [MAGIC-AI4Med/MedRBench](https://github.com/MAGIC-AI4Med/MedRBench)
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `answer` | Submit your diagnosis or treatment plan for binary grading. Returns grade, explanation, and reference answer. |
+
+## Time Horizon
+
+MedRBench is a single-turn environment. The agent receives a medical case report and submits one answer.
+
+## Environment Difficulty
+
+Cases involve rare and complex diseases sourced from medical literature, requiring deep clinical reasoning. The benchmark quantifies reasoning abilities across body systems and disorder categories.
+
+## Other Environment Requirements
+
+- **OpenAI API key**: Required for LLM-based semantic grading. Pass via `secrets={"openai_api_key": "..."}`.
+
+## Safety
+
+MedRBench evaluates medical reasoning on published case reports and should not be used as a substitute for professional medical advice. The environment does not involve real patient care or clinical decision-making.
+
+## Citations
+
+```bibtex
+@article{qiu2025medrbench,
+  author    = {Pengcheng Qiu and Chaoyi Wu and Shuyu Liu and Weike Zhao and Ya Zhang and Yanfeng Wang and Weidi Xie},
+  title     = {Quantifying the Reasoning Abilities of LLMs on Real-world Clinical Cases},
+  journal   = {arXiv preprint arXiv:2503.04691},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2503.04691}
+}
+```
