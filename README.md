@@ -1,6 +1,6 @@
 # MedRBench
 
-[![⭐ OpenReward Environment](https://img.shields.io/badge/%E2%AD%90%20OpenReward-Environment-f7e6cc)](https://openreward.ai/GeneralReasoning/medrb)
+[![⭐ OpenReward Environment](https://img.shields.io/badge/%E2%AD%90%20OpenReward-Environment-f7e6cc)](https://openreward.ai/GeneralReasoning/medrb) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-orange)](https://huggingface.co/datasets/MAGIC-AI4Med/MedRBench)
 
 ## Description
 
@@ -18,7 +18,7 @@ Agents are given a standard sandbox environment. No special compute resources ar
 
 ## License
 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ## Tasks
 
@@ -63,7 +63,17 @@ MedRBench is a single-turn environment. The agent receives a medical case report
 
 ## Environment Difficulty
 
-Cases involve rare and complex diseases sourced from medical literature, requiring deep clinical reasoning. The benchmark quantifies reasoning abilities across body systems and disorder categories.
+The original paper evaluates LLMs on diagnosis and treatment tasks:
+
+| Model | Diagnosis | Treatment |
+|-------|-----------|-----------|
+| DeepSeek-R1 | 89.8% | 30.5% |
+| Gemini-2.0-FT | 86.8% | - |
+| Qwen-QwQ | 85.1% | - |
+| OpenAI-o3-mini | 83.9% | 27.0% |
+| Baichuan-M1 | 84.4% | 30.7% |
+
+LLMs achieve >80% on diagnosis with complete information, but treatment planning remains challenging (<31% accuracy).
 
 ## Other Environment Requirements
 
