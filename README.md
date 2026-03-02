@@ -14,7 +14,7 @@ MedRBench is an environment for evaluating medical diagnosis and treatment plan 
 
 ## Compute Requirements
 
-Agents are given a standard sandbox environment. No special compute resources are required.
+This benchmark does not require a sandbox.
 
 ## License
 
