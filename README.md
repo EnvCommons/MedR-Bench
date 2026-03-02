@@ -59,7 +59,7 @@ Source: [MAGIC-AI4Med/MedRBench](https://github.com/MAGIC-AI4Med/MedRBench)
 
 ## Time Horizon
 
-MedRBench is a single-turn environment. The agent receives a medical case report and submits one answer.
+MedRBench is a single-turn environment. The agent receives a medical case report and submits one answer, i.e. a single tool call.
 
 ## Environment Difficulty
 
